@@ -4,6 +4,10 @@ tui tools for daily drivers
 * editor
   * micro
 
+* dev work
+  * cani
+  * lazygit
+
 * word precessing
 
 * translate
@@ -85,4 +89,7 @@ tui tools for daily drivers
 
 * flashcards
   * hascard
+
+* system management
+  * cylon
 
