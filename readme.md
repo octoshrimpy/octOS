@@ -43,6 +43,7 @@ tui tools for daily drivers
   * spotify-tui (spotify)
   * gomu (local)
   * ytui-music (youtube)
+  * pyradio (radio)
   
 * chat
   * gomuks (element)
@@ -63,6 +64,7 @@ tui tools for daily drivers
 
 * file browser
   * tuifimanager
+
 * markdown browser (gh too)
   * frogmouth
   
