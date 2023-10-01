@@ -68,6 +68,7 @@ tui tools for daily drivers
 
 * file browser
   * tuifimanager
+  * shfm
 
 * markdown browser (gh too)
   * frogmouth
