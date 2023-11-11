@@ -1,0 +1,9 @@
+#form {
+  padding: 0 10;
+  align: center middle;
+}
+
+#form Input {
+  max-width: 30;
+  margin: 1;
+}
