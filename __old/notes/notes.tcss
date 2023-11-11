@@ -1,0 +1,10 @@
+#sidebar {
+  dock: left;
+  width: 4;
+  height: 100%;}
+
+button {
+    min-width: 0;
+    padding: 0;
+    border: none;
+  }
