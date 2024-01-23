@@ -7,6 +7,127 @@ export HISTTIMEFORMAT="%d/%m/%y %T "
 # -- functions --------------
 
 
+# quickly jot down ideas from anywhere
+# req:
+#   gum     - https://github.com/charmbracelet/gum
+idea() {
+    
+    # Check if the environment variable IDEAS_PATH is set
+    if [ -n "$IDEAS_PATH" ]; then
+      mainpath="$IDEAS_PATH"
+    else
+      mainpath="$HOME/ideas"
+    fi
+    
+    # Enter alternate buffer and move cursor to top-left
+    echo -e "\033[?1049h\033[H"
+    
+    # Capture multi-line input from gum textarea into a temporary file
+    tempfile=$(mktemp)
+    gum write --header "Type your full idea here (CTRL+D to continue)" > "$tempfile"
+
+    # Check if the file is empty (no input given)
+    if [ ! -s "$tempfile" ]; then
+        echo "No input provided. Exiting..."
+        rm "$tempfile"
+        return
+    fi
+
+    # Read the contents of the file into a variable and truncate
+    file_contents="$(cat $tempfile)"
+
+    # Check if the string length is greater than 25 characters before truncating
+    if [ ${#file_contents} -gt 25 ]; then
+      trunc_temp="${file_contents:0:25} ..."
+    else
+      trunc_temp="$file_contents"
+    fi
+    
+    # Ensure the tags file exists
+    tags_file="$mainpath/.tags"
+    mkdir -p "$(dirname "$tags_file")"
+    touch "$tags_file"
+    
+
+    selected_tags=""
+
+    while :; do
+      do_loop=false
+
+      # Read old tags from the .tags file
+      old_tags="$(cat $tags_file)"
+
+      # Use gum filter to select tags (add any necessary options)
+      selected_tags=$(gum filter --no-limit --no-strict <<< "$old_tags")
+      for tag in $selected_tags; do
+        found=false
+
+        # Check if the selected tag is already in old_tags
+        for line in $old_tags; do
+          if [ "$tag" == "$line" ]; then
+            found=true
+            break
+          fi
+        done
+
+        # If the tag is not found, append it to old_tags
+        if [ "$found" == "false" ]; then
+          echo "$tag" >> $tags_file
+          do_loop=true
+        fi
+      done
+
+      if [ "$do_loop" == "false" ]; then
+        break
+      fi
+    done
+
+
+    # Generate the tags string
+    tags_string=$(echo "$selected_tags" | awk '{print "#"$0}' | awk 'ORS=" "' | sed 's/^# //' | sed 's/ # $//')
+    
+    tags_string=${tags_string% }  # Remove the trailing space
+    
+    # Display truncated content and tags
+    echo "| $trunc_temp"
+    echo "> $tags_string"
+    echo ""
+    
+    # Prompt for a title
+    title=$(gum input --placeholder "$tags_string" --header "Enter title (optional)")
+
+    # Determine the filename with timestamp and title
+    timestamp=$(date +"%Y%m%d_%H%M%S")
+
+    # Check if title is empty, if not, use it, otherwise use tags
+    if [ -n "$title" ]; then
+      filename="$title"
+    else
+      filename="$tags"
+    fi
+
+    # Ensure the thoughts directory exists and move the file
+    mkdir -p "$mainpath/"
+
+    filepath="$mainpath/$filename.txt"
+    # Create a new file with the filename and append timestamp and tags
+    touch "$filepath"
+
+    echo "---------------" > "$filepath"
+    echo "title : $title" >> "$filepath"
+    echo "time  : $timestamp" >> "$filepath"
+    echo "tags  : $tags_string" >> "$filepath"
+    echo "---------------"  >> "$filepath"
+    cat "$tempfile" >> "$filepath"
+
+    # Remove the temporary file
+    rm "$tempfile"
+
+    # Exit alternate buffer
+    echo -e "\033[?1049l"
+}
+
+
 # quick single-reply duckduckgo search
 # req: 
 #   ddgr - https://github.com/jarun/ddgr
