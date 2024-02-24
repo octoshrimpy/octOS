@@ -161,9 +161,15 @@ slow () {
 # req:
 #   git - https://github.com/git-guides/install-git
 function yeet() {
+  msg="$*"
+  # if no changes, exit
+  if ! git diff-index --quiet HEAD --; then
     git add .
-    git commit -a -m "$*"
+    git commit -m "$msg"
     git push
+  else
+    echo "No changes to commit."
+  fi
 }
 
 # make missing directories between "here" and "there.md", create "there.md"
